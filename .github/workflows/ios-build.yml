@@ -25,7 +25,6 @@ jobs:
           brew update
           brew install cocoapods || brew upgrade cocoapods
           sudo gem install fastlane -NV
-          cd src
           pod install
 
       - name: Decode credentials
@@ -54,7 +53,6 @@ jobs:
       - name: Build and Deploy with Fastlane
         run: |
           set -ex
-          cd src
           fastlane release
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
