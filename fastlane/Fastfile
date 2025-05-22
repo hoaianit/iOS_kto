@@ -7,10 +7,13 @@ platform :ios do
       workspace: "KhoaTuOnline.xcworkspace",
       scheme: "KhoaTuOnline",
       export_method: "app-store",
+      export_team_id: ENV["TEAM_ID"],
       output_name: "App.ipa",
-      xcodebuild_formatter: nil, # 👈 Add this line
-      export_team_id: ENV["TEAM_ID"] # 👈 Team ID added here
+      clean: true,
+      verbose: true,      # Show more build logs
+      xcodebuild_formatter: "xcpretty" # or nil if you want raw output
     )
+
 
     app_store_connect_api_key(
       key_id: ENV["APP_STORE_KEY_ID"],
