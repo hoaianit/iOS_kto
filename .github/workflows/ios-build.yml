@@ -62,3 +62,4 @@ jobs:
           APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
           APP_STORE_KEY: ${{ secrets.APP_STORE_KEY }}
           CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }} 
