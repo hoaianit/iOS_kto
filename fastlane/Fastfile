@@ -9,7 +9,7 @@ platform :ios do
       export_method: "app-store",
       output_name: "App.ipa",
       xcodebuild_formatter: nil, # 👈 Add this line
-      team_id: ENV["TEAM_ID"] # 👈 Team ID added here
+      export_team_id: ENV["TEAM_ID"] # 👈 Team ID added here
     )
 
     app_store_connect_api_key(
@@ -20,7 +20,7 @@ platform :ios do
     )
 
     upload_to_testflight(
-      team_id: ENV["TEAM_ID"] # 👈 Optional: also include here if needed
+      export_team_id: ENV["TEAM_ID"] # 👈 Optional: also include here if needed
     )
   end
 end
