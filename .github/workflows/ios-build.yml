@@ -1,0 +1,55 @@
+name: iOS Build and Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+
+      - name: Install dependencies
+        run: |
+          brew install cocoapods
+          sudo gem install fastlane -NV
+          cd src
+          pod install
+
+      - name: Decode credentials
+        run: |
+          echo "$CERTIFICATE_P12" | base64 --decode > cert.p12
+          echo "$PROVISIONING_PROFILE" | base64 --decode > profile.mobileprovision
+          echo "$APP_STORE_KEY" | base64 --decode > AuthKey.p8
+        env:
+          CERTIFICATE_P12: ${{ secrets.CERTIFICATE_P12 }}
+          PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
+          APP_STORE_KEY: ${{ secrets.APP_STORE_KEY }}
+
+      - name: Set up code signing
+        run: |
+          security create-keychain -p github build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p github build.keychain
+          security import cert.p12 -k build.keychain -P "${CERTIFICATE_PASSWORD}" -T /usr/bin/codesign
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+        env:
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+
+      - name: Build and Deploy with Fastlane
+        run: |
+          cd src
+          fastlane release
+        env:
+          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+          APP_STORE_KEY: ${{ secrets.APP_STORE_KEY }}
