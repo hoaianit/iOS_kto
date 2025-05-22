@@ -21,13 +21,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cocoapods
+          set -ex
+          brew update
+          brew install cocoapods || brew upgrade cocoapods
           sudo gem install fastlane -NV
           cd src
           pod install
 
       - name: Decode credentials
         run: |
+          set -ex
           echo "$CERTIFICATE_P12" | base64 --decode > cert.p12
           echo "$PROVISIONING_PROFILE" | base64 --decode > profile.mobileprovision
           echo "$APP_STORE_KEY" | base64 --decode > AuthKey.p8
@@ -38,6 +41,7 @@ jobs:
 
       - name: Set up code signing
         run: |
+          set -ex
           security create-keychain -p github build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p github build.keychain
@@ -49,9 +53,11 @@ jobs:
 
       - name: Build and Deploy with Fastlane
         run: |
+          set -ex
           cd src
           fastlane release
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
           APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
           APP_STORE_KEY: ${{ secrets.APP_STORE_KEY }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
